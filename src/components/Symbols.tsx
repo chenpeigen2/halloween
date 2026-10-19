@@ -1,6 +1,7 @@
 import { m } from 'framer-motion'
 import { SectionHead } from './SectionHead'
 import { useHoverCapable } from '../lib/env'
+import { revealTransition, useRevealState } from './Reveal'
 
 const symbols = [
   {
@@ -47,6 +48,7 @@ const symbols = [
 
 export function Symbols() {
   const hover = useHoverCapable()
+  const { ref: gridRef, inView, playing } = useRevealState('-50px')
   return (
     <section id="symbols" className="relative mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
       <SectionHead
@@ -56,14 +58,22 @@ export function Symbols() {
         desc="当夜幕降临，这些形象就成了万圣节的语言。"
       />
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div ref={gridRef as React.RefObject<HTMLDivElement>} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {symbols.map((s, i) => (
           <m.article
             key={s.title}
             initial={{ opacity: 0, scale: 0.78, y: 26 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ margin: '-50px' }}
-            transition={{ type: 'spring', stiffness: 130, damping: 13, delay: (i % 4) * 0.1 }}
+            animate={
+              inView
+                ? { opacity: 1, scale: 1, y: 0 }
+                : { opacity: 0, scale: 0.78, y: 26 }
+            }
+            transition={revealTransition(playing, {
+              type: 'spring',
+              stiffness: 130,
+              damping: 13,
+              delay: (i % 4) * 0.1,
+            })}
             whileHover={hover ? { y: -6, scale: 1.04 } : undefined}
             className="card group relative overflow-hidden p-6 text-center"
           >

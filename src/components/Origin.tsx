@@ -1,6 +1,6 @@
 import { m } from 'framer-motion'
 import { SectionHead } from './SectionHead'
-import { CountUp, Reveal } from './Reveal'
+import { CountUp, Reveal, revealTransition, useRevealState } from './Reveal'
 
 const stats = [
   { value: <CountUp to={2000} suffix="+" />, label: '年历史' },
@@ -8,11 +8,6 @@ const stats = [
   { value: <CountUp to={72} suffix="%" />, label: '美国消费者参与庆祝' },
   { value: <CountUp to={8} />, label: '部万圣节必看恐怖片' },
 ]
-
-const fade = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.65 } },
-}
 
 const blocks = [
   {
@@ -38,6 +33,8 @@ const blocks = [
 ]
 
 export function Origin() {
+  // 卡片组共用一个观察器：向上滚时整组瞬间显示
+  const { ref: gridRef, inView, playing } = useRevealState('-80px')
   return (
     <section id="origin" className="relative mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
       <SectionHead
@@ -47,14 +44,13 @@ export function Origin() {
         desc="从凯尔特的篝火到霓虹灯下的糖果——万圣节是层层叠叠的两千年。"
       />
 
-      <div className="grid gap-7 sm:grid-cols-2">
+      <div ref={gridRef as React.RefObject<HTMLDivElement>} className="grid gap-7 sm:grid-cols-2">
         {blocks.map((b, i) => (
           <m.article
             key={b.title}
-            variants={fade}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ margin: '-80px' }}
+            initial={{ opacity: 0, y: 28 }}
+            animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
+            transition={revealTransition(playing, { duration: 0.65, delay: (i % 2) * 0.1 })}
             className="card card-frame p-8"
           >
             <div className="flex items-center gap-4">

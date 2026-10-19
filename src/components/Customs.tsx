@@ -1,5 +1,6 @@
 import { m } from 'framer-motion'
 import { SectionHead } from './SectionHead'
+import { revealTransition, useRevealState } from './Reveal'
 
 const customs = [
   {
@@ -41,6 +42,7 @@ const customs = [
 ]
 
 export function Customs() {
+  const { ref: gridRef, inView, playing } = useRevealState('-60px')
   return (
     <section id="customs" className="relative overflow-hidden py-20 sm:py-28">
       <div
@@ -56,14 +58,21 @@ export function Customs() {
           desc="六件小事，构成一个节日的夜晚。"
         />
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div ref={gridRef as React.RefObject<HTMLDivElement>} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {customs.map((c, i) => (
             <m.article
               key={c.title}
               initial={{ opacity: 0, y: 36, rotate: i % 2 ? 2.5 : -2.5 }}
-              whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-              viewport={{ margin: '-60px' }}
-              transition={{ duration: 0.6, delay: (i % 3) * 0.12, ease: [0.2, 0.7, 0.2, 1] }}
+              animate={
+                inView
+                  ? { opacity: 1, y: 0, rotate: 0 }
+                  : { opacity: 0, y: 36, rotate: i % 2 ? 2.5 : -2.5 }
+              }
+              transition={revealTransition(playing, {
+                duration: 0.6,
+                delay: (i % 3) * 0.12,
+                ease: [0.2, 0.7, 0.2, 1],
+              })}
               className="card group p-7"
             >
               <div className="flex items-start justify-between">

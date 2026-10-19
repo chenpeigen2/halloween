@@ -3,6 +3,7 @@ import { AnimatePresence, m, useInView } from 'framer-motion'
 import { movies, type Movie } from '../data/movies'
 import { Poster } from './Poster'
 import { SceneVignette } from './SceneFX'
+import { revealTransition, useRevealState } from './Reveal'
 import { useHoverCapable } from '../lib/env'
 
 type TrailerState = 'idle' | 'probing' | 'playing' | 'offline'
@@ -177,6 +178,9 @@ export function Cinema() {
   const [active, setActive] = useState<Movie | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
   const hover = useHoverCapable()
+  // 招牌区与海报墙各自观察：向上滚时瞬间显示
+  const head = useRevealState('-80px')
+  const wall = useRevealState('-40px')
   // 跑马灯不在视口时暂停
   const marqueeRef = useRef<HTMLDivElement>(null)
   const marqueeInView = useInView(marqueeRef, { margin: '80px' })
@@ -206,13 +210,24 @@ export function Cinema() {
       </div>
 
       {/* 霓虹招牌 */}
-      <div className="relative mx-auto max-w-6xl px-5 pt-16 text-center sm:px-16">
+      <div
+        ref={head.ref as React.RefObject<HTMLDivElement>}
+        className="relative mx-auto max-w-6xl px-5 pt-16 text-center sm:px-16"
+      >
         <p className="kicker">Halloween Cinema</p>
         <m.h2
           initial={{ opacity: 0, scale: 0.82, filter: 'blur(12px)' }}
-          whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          viewport={{ margin: '-80px' }}
-          transition={{ duration: 0.8, type: 'spring', stiffness: 90, damping: 13 }}
+          animate={
+            head.inView
+              ? { opacity: 1, scale: 1, filter: 'blur(0px)' }
+              : { opacity: 0, scale: 0.82, filter: 'blur(12px)' }
+          }
+          transition={revealTransition(head.playing, {
+            duration: 0.8,
+            type: 'spring',
+            stiffness: 90,
+            damping: 13,
+          })}
           className="neon text-stroke-dark mt-6 font-display text-4xl leading-tight tracking-[0.04em] text-ember sm:text-6xl"
           style={{ textShadow: '0 0 18px rgba(255,122,26,0.65), 0 0 60px rgba(255,122,26,0.35)' }}
         >
@@ -220,9 +235,8 @@ export function Cinema() {
         </m.h2>
         <m.p
           initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ margin: '-70px' }}
-          transition={{ duration: 0.7, delay: 0.25 }}
+          animate={head.inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
+          transition={revealTransition(head.playing, { duration: 0.7, delay: 0.25 })}
           className="mx-auto mt-5 max-w-xl text-sm leading-7 text-ash sm:text-[15px]"
         >
           八部定义了万圣节夜晚的经典恐怖片。点开海报，看看你敢不敢按下播放。
@@ -242,15 +256,26 @@ export function Cinema() {
 
       {/* 海报墙 */}
       <div className="relative mx-auto max-w-6xl px-5 pt-12 sm:px-10">
-        <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-7">
+        <div
+          ref={wall.ref as React.RefObject<HTMLDivElement>}
+          className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-7"
+        >
           {movies.map((mv, i) => (
             <m.button
               key={mv.id}
               onClick={() => setActive(mv)}
               initial={{ opacity: 0, y: 64, rotate: i % 2 ? 9 : -9, scale: 0.86 }}
-              whileInView={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
-              viewport={{ margin: '-40px' }}
-              transition={{ type: 'spring', stiffness: 110, damping: 14, delay: (i % 4) * 0.12 }}
+              animate={
+                wall.inView
+                  ? { opacity: 1, y: 0, rotate: 0, scale: 1 }
+                  : { opacity: 0, y: 64, rotate: i % 2 ? 9 : -9, scale: 0.86 }
+              }
+              transition={revealTransition(wall.playing, {
+                type: 'spring',
+                stiffness: 110,
+                damping: 14,
+                delay: (i % 4) * 0.12,
+              })}
               whileHover={hover ? { y: -10, rotate: i % 2 ? -1.6 : 1.6, scale: 1.03 } : undefined}
               whileTap={{ scale: 0.97 }}
               className="group relative overflow-hidden rounded-xl border border-gold/20 bg-ink-2 text-left shadow-[0_16px_40px_-16px_rgba(0,0,0,0.85)] transition-colors hover:border-ember/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ember"

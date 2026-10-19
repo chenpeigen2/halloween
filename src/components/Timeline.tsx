@@ -2,6 +2,47 @@ import { useRef } from 'react'
 import { m, useScroll, useSpring } from 'framer-motion'
 import { SectionHead } from './SectionHead'
 import { SceneVignette } from './SceneFX'
+import { revealTransition, useRevealState } from './Reveal'
+
+type TimelineEvent = (typeof events)[number]
+
+/** 单个时间线节点：各自独立观察，向上滚时瞬间显示 */
+function TimelineItem({ e, i }: { e: TimelineEvent; i: number }) {
+  const { ref, inView, playing } = useRevealState('-60px')
+  const hidden = { opacity: 0, x: e.side === 'left' ? -40 : 40 }
+  return (
+    <m.li
+      ref={ref as React.RefObject<HTMLLIElement>}
+      initial={hidden}
+      animate={inView ? { opacity: 1, x: 0 } : hidden}
+      transition={revealTransition(playing, { duration: 0.6, ease: 'easeOut' })}
+      className={`relative sm:flex sm:items-center ${
+        e.side === 'right' ? 'sm:flex-row-reverse' : ''
+      }`}
+    >
+      <div className={`sm:w-1/2 ${e.side === 'right' ? 'sm:pl-10' : 'sm:pr-10'}`}>
+        <div className="card px-6 py-5">
+          <div className="flex items-baseline gap-3">
+            <span className="font-round text-xs font-bold tracking-[0.28em] text-gold">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <span className="text-xs tracking-[0.22em] text-ember">{e.era}</span>
+          </div>
+          <h3 className="mt-2 font-cute text-lg font-semibold text-bone">{e.title}</h3>
+          <p className="mt-2 text-sm leading-7 text-ash">{e.desc}</p>
+        </div>
+      </div>
+
+      {/* 节点：发光菱形 */}
+      <span
+        aria-hidden="true"
+        className="absolute left-1/2 top-1/2 hidden h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-ember bg-ink sm:block"
+        style={{ boxShadow: '0 0 16px rgba(255,140,66,0.8)' }}
+      />
+      <span className="hidden sm:block sm:w-1/2" />
+    </m.li>
+  )
+}
 
 const events = [
   {
@@ -104,37 +145,7 @@ export function Timeline() {
 
         <ol className="space-y-9">
           {events.map((e, i) => (
-            <m.li
-              key={e.title}
-              initial={{ opacity: 0, x: e.side === 'left' ? -40 : 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ margin: '-60px' }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-              className={`relative sm:flex sm:items-center ${
-                e.side === 'right' ? 'sm:flex-row-reverse' : ''
-              }`}
-            >
-              <div className={`sm:w-1/2 ${e.side === 'right' ? 'sm:pl-10' : 'sm:pr-10'}`}>
-                <div className="card px-6 py-5">
-                  <div className="flex items-baseline gap-3">
-                    <span className="font-round text-xs font-bold tracking-[0.28em] text-gold">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <span className="text-xs tracking-[0.22em] text-ember">{e.era}</span>
-                  </div>
-                  <h3 className="mt-2 font-cute text-lg font-semibold text-bone">{e.title}</h3>
-                  <p className="mt-2 text-sm leading-7 text-ash">{e.desc}</p>
-                </div>
-              </div>
-
-              {/* 节点：发光菱形 */}
-              <span
-                aria-hidden="true"
-                className="absolute left-1/2 top-1/2 hidden h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-ember bg-ink sm:block"
-                style={{ boxShadow: '0 0 16px rgba(255,140,66,0.8)' }}
-              />
-              <span className="hidden sm:block sm:w-1/2" />
-            </m.li>
+            <TimelineItem key={e.title} e={e} i={i} />
           ))}
         </ol>
 
