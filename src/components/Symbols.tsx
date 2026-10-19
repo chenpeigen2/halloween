@@ -58,7 +58,7 @@ export function Symbols() {
         desc="当夜幕降临，这些形象就成了万圣节的语言。"
       />
 
-      <div ref={gridRef as React.RefObject<HTMLDivElement>} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div ref={gridRef as React.RefObject<HTMLDivElement>} className="grid gap-x-5 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4">
         {symbols.map((s, i) => (
           <m.article
             key={s.title}
@@ -74,8 +74,8 @@ export function Symbols() {
               damping: 13,
               delay: (i % 4) * 0.1,
             })}
-            whileHover={hover ? { y: -6, scale: 1.04 } : undefined}
-            className="card group relative overflow-hidden p-6 text-center"
+            whileHover={hover ? { scale: 1.03 } : undefined}
+            className="card group relative overflow-hidden p-6 text-center hover:z-10"
           >
             {/* 顶部微光 */}
             <div className="absolute inset-x-0 -top-10 h-20 bg-gradient-to-b from-violet/25 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
