@@ -35,3 +35,25 @@ export function useLowEnd(): boolean {
   })
   return lowEnd
 }
+
+/* ---------- 滚动方向（同步读取，无 React 调度竞态）----------
+ * 向下滑（包括快速甩动）：照常播放入场动画；
+ * 向上滑（回顶）：瞬间显示，保顺滑。
+ */
+let scrollDir: 'up' | 'down' = 'down'
+if (typeof window !== 'undefined') {
+  let lastY = window.scrollY
+  window.addEventListener(
+    'scroll',
+    () => {
+      const y = window.scrollY
+      if (y > lastY) scrollDir = 'down'
+      else if (y < lastY) scrollDir = 'up'
+      lastY = y
+    },
+    { passive: true },
+  )
+}
+export function scrollDirectionNow(): 'up' | 'down' {
+  return scrollDir
+}

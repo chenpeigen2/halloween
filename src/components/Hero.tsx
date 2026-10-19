@@ -10,7 +10,7 @@ import {
 } from 'framer-motion'
 import { AmbientGhosts, CandyRain } from './Ghosts'
 import { Magnetic } from './FX'
-import { useHoverCapable, useLowEnd } from '../lib/env'
+import { useLowEnd } from '../lib/env'
 
 /* ---------------- 倒计时 ---------------- */
 function nextHalloween(): Date {
@@ -284,7 +284,6 @@ export function Hero() {
 
   // 安卓中低端机：降级装饰层
   const lowEnd = useLowEnd()
-  const hover = useHoverCapable()
   // Hero 滚出视口后暂停装饰动画（滚动时省下大量 CPU）
   const heroInView = useInView(heroRef, { margin: '120px' })
 
@@ -298,8 +297,8 @@ export function Hero() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_62%_18%,#2c1a52_0%,#160e2c_38%,#0a0710_72%)]" />
       <StarBand stars={STARS_FAR} progress={scrollYProgress} xRange={[0, -40]} yRange={[0, -20]} />
       <StarBand stars={STARS_MID} progress={scrollYProgress} xRange={[0, 55]} yRange={[0, -45]} />
-      {/* 触屏省掉最近层：视差幅度最大、观感收益最小 */}
-      {hover && !lowEnd && (
+      {/* 低端机省掉最近层：视差幅度最大、观感收益最小 */}
+      {!lowEnd && (
         <StarBand stars={STARS_NEAR} progress={scrollYProgress} xRange={[0, -110]} yRange={[0, -80]} />
       )}
 
@@ -366,10 +365,10 @@ export function Hero() {
           transition={{ duration: 1, ease: 'easeOut' }}
           className="mt-6"
         >
-          {hover ? (
+          {!lowEnd ? (
             <ScatterTitle progress={scrollYProgress} />
           ) : (
-            /* 触屏：不逐字散开（省 36 个滚动 transform），观感几乎一致 */
+            /* 低端机：不逐字散开（省 36 个滚动 transform），观感几乎一致 */
             <h1
               className="font-display text-[clamp(2.6rem,12vw,3.6rem)] leading-[1.02] tracking-[0.02em] sm:text-[6.4rem]"
               aria-label="HALLOWEEN"
