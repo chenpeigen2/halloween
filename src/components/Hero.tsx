@@ -10,7 +10,7 @@ import {
 } from 'framer-motion'
 import { AmbientGhosts, CandyRain } from './Ghosts'
 import { Magnetic } from './FX'
-import { useLowEnd } from '../lib/env'
+import { useLowEnd, useMediaQuery } from '../lib/env'
 
 /* ---------------- 倒计时 ---------------- */
 function nextHalloween(): Date {
@@ -189,17 +189,20 @@ function ScatterChar({
   ch,
   i,
   progress,
+  simple,
 }: {
   ch: string
   i: number
   progress: MotionValue<number>
+  simple?: boolean
 }) {
   const dir = i % 2 ? 1 : -1
   const dist = 1 + Math.abs(i - 4) * 0.55 // 两端字飞得更远
   const y = useTransform(progress, [0, 1], [0, -(36 + dist * 72)])
-  const x = useTransform(progress, [0, 1], [0, dir * dist * 48])
-  const rotate = useTransform(progress, [0, 1], [0, dir * dist * 18])
   const opacity = useTransform(progress, [0, 0.55], [1, 0])
+  // simple（触屏）：只做平移+透明度；rotate/x 会逼渐变文字逐帧重绘
+  const x = useTransform(progress, [0, 1], [0, simple ? 0 : dir * dist * 48])
+  const rotate = useTransform(progress, [0, 1], [0, simple ? 0 : dir * dist * 18])
 
   return (
     <m.span className="inline-block" style={{ y, x, rotate, opacity }}>
@@ -213,14 +216,20 @@ function ScatterChar({
   )
 }
 
-function ScatterTitle({ progress }: { progress: MotionValue<number> }) {
+function ScatterTitle({
+  progress,
+  simple,
+}: {
+  progress: MotionValue<number>
+  simple?: boolean
+}) {
   return (
     <h1
       className="font-display text-[clamp(2.6rem,12vw,3.6rem)] leading-[1.02] tracking-[0.02em] sm:text-[6.4rem]"
       aria-label="HALLOWEEN"
     >
       {[...'HALLOWEEN'].map((ch, i) => (
-        <ScatterChar key={`${ch}-${i}`} ch={ch} i={i} progress={progress} />
+        <ScatterChar key={`${ch}-${i}`} ch={ch} i={i} progress={progress} simple={simple} />
       ))}
     </h1>
   )
@@ -276,6 +285,8 @@ export function Hero() {
   const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0])
   const scaleMoon = useTransform(scrollYProgress, [0, 1], [1, 1.18])
   // 滚动速度联动：滑得越快，内容轻微倾斜（回弹感）
+  // 触屏不启用：skew 会逼整片文字逐帧重绘
+  const touch = useMediaQuery('(hover: none)')
   const vel = useVelocity(scrollY)
   const skewY = useSpring(
     useTransform(vel, [-2600, 2600], [3.2, -3.2], { clamp: true }),
@@ -317,7 +328,7 @@ export function Hero() {
           className="pointer-events-none absolute -inset-6 rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(232,192,122,0.22) 0%, rgba(232,192,122,0) 72%)' }}
         />
-        <div className="relative h-28 w-28 rounded-full bg-gradient-to-b from-[#f6e8c8] to-[#cbb387] shadow-[0_0_90px_rgba(232,192,122,0.5)] sm:h-36 sm:w-36">
+        <div className="relative h-28 w-28 rounded-full bg-gradient-to-b from-[#f6e8c8] to-[#cbb387] sm:h-36 sm:w-36">
           <span className="absolute left-[22%] top-[30%] h-4 w-4 rounded-full bg-[#b89b6c]/60" />
           <span className="absolute right-[26%] top-[52%] h-6 w-6 rounded-full bg-[#b89b6c]/50" />
           <span className="absolute left-[46%] top-[18%] h-2.5 w-2.5 rounded-full bg-[#b89b6c]/60" />
@@ -347,7 +358,7 @@ export function Hero() {
       {/* 内容 */}
       {/* 内容（反向视差 + 渐隐） */}
       <m.div
-        style={{ y: yContent, opacity: fade, skewY }}
+        style={{ y: yContent, opacity: fade, skewY: touch ? undefined : skewY }}
         className="relative z-10 mx-auto w-full max-w-3xl px-5 pt-28 pb-52 text-center sm:px-6 sm:pb-64"
       >
         <m.p
@@ -366,7 +377,7 @@ export function Hero() {
           className="mt-6"
         >
           {!lowEnd ? (
-            <ScatterTitle progress={scrollYProgress} />
+            <ScatterTitle progress={scrollYProgress} simple={touch} />
           ) : (
             /* 低端机：不逐字散开（省 36 个滚动 transform），观感几乎一致 */
             <h1
