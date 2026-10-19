@@ -336,9 +336,9 @@ export function Hero() {
         </div>
       </m.div>
 
-      <Bats count={lowEnd ? 2 : 5} />
+      <Bats count={lowEnd ? 2 : touch ? 3 : 5} />
       <AmbientGhosts count={lowEnd ? 3 : 5} />
-      {!lowEnd && <CandyRain count={7} />}
+      {!lowEnd && <CandyRain count={touch ? 4 : 7} />}
 
       {/* 雾（渐变实现，无 blur 滤镜） */}
       <div

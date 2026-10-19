@@ -13,8 +13,9 @@ export function SectionHead({
   desc?: string
   en: string
 }) {
-  // 触屏用 tween：逐字 spring 在安卓上积分器开销大
+  // 触屏用 tween，且逐字入场去掉 rotate/scale：渐变+描边文字的旋转缩放会逐字重绘
   const hover = useHoverCapable()
+  const simple = !hover
   // 整个标题组共用一个观察器；向上滚时全部瞬间显示
   const { ref, inView, playing } = useRevealState('-80px')
 
@@ -36,11 +37,19 @@ export function SectionHead({
           <m.span
             key={`${ch}-${i}`}
             className="inline-block"
-            initial={{ opacity: 0, y: 28, rotate: i % 2 ? 7 : -7, scale: 0.8 }}
+            initial={
+              simple
+                ? { opacity: 0, y: 28 }
+                : { opacity: 0, y: 28, rotate: i % 2 ? 7 : -7, scale: 0.8 }
+            }
             animate={
               inView
-                ? { opacity: 1, y: 0, rotate: 0, scale: 1 }
-                : { opacity: 0, y: 28, rotate: i % 2 ? 7 : -7, scale: 0.8 }
+                ? simple
+                  ? { opacity: 1, y: 0 }
+                  : { opacity: 1, y: 0, rotate: 0, scale: 1 }
+                : simple
+                  ? { opacity: 0, y: 28 }
+                  : { opacity: 0, y: 28, rotate: i % 2 ? 7 : -7, scale: 0.8 }
             }
             transition={revealTransition(
               playing,
