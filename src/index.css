@@ -293,13 +293,31 @@ body {
   background-position: center;
 }
 
+/* ---------- 炫酷：标题字符波浪 + 悬停跳动（仅鼠标设备） ---------- */
+@keyframes char-wave {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+.char-wave {
+  display: inline-block;
+  animation: char-wave 3.2s ease-in-out infinite;
+}
+@media (hover: hover) and (pointer: fine) {
+  .char-wave:hover {
+    animation-play-state: paused;
+    transform: translateY(-13px) scale(1.16) rotate(-5deg);
+    transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1.5);
+  }
+}
+
 /* ---------- 滚动时暂停不可见区域的动画 ---------- */
 .deco-paused .bat,
 .deco-paused .bat .wing,
 .deco-paused .candy-drift,
 .deco-paused .bob,
 .deco-paused .blink,
-.deco-paused .glow-svg {
+.deco-paused .glow-svg,
+.deco-paused .char-wave {
   animation-play-state: paused;
 }
 .marquee.is-paused {
@@ -326,6 +344,9 @@ body {
   }
   .twinkle {
     animation: none !important;
+  }
+  .char-wave {
+    animation: none;
   }
   /* iOS：emoji 阴影动画会逐帧重绘位图字形，改静态光 */
   .glow {

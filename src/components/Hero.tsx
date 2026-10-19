@@ -4,9 +4,12 @@ import {
   useInView,
   useScroll,
   useTransform,
+  useVelocity,
+  useSpring,
   type MotionValue,
 } from 'framer-motion'
 import { AmbientGhosts, CandyRain } from './Ghosts'
+import { Magnetic } from './FX'
 import { useHoverCapable, useLowEnd } from '../lib/env'
 
 /* ---------------- 倒计时 ---------------- */
@@ -199,11 +202,13 @@ function ScatterChar({
   const opacity = useTransform(progress, [0, 0.55], [1, 0])
 
   return (
-    <m.span
-      className="text-ember-grad text-stroke-dark inline-block"
-      style={{ y, x, rotate, opacity }}
-    >
-      {ch}
+    <m.span className="inline-block" style={{ y, x, rotate, opacity }}>
+      <span
+        className="char-wave text-ember-grad text-stroke-dark"
+        style={{ animationDelay: `${i * 0.18}s` }}
+      >
+        {ch}
+      </span>
     </m.span>
   )
 }
@@ -264,12 +269,18 @@ function Countdown() {
 export function Hero() {
   // 视差：滚动时各层以不同速度移动
   const heroRef = useRef<HTMLElement>(null)
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
+  const { scrollY, scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const yMoon = useTransform(scrollYProgress, [0, 1], [0, -160])
   const yLand = useTransform(scrollYProgress, [0, 1], [0, -40])
   const yContent = useTransform(scrollYProgress, [0, 1], [0, 130])
   const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0])
   const scaleMoon = useTransform(scrollYProgress, [0, 1], [1, 1.18])
+  // 滚动速度联动：滑得越快，内容轻微倾斜（回弹感）
+  const vel = useVelocity(scrollY)
+  const skewY = useSpring(
+    useTransform(vel, [-2600, 2600], [3.2, -3.2], { clamp: true }),
+    { stiffness: 170, damping: 26 },
+  )
 
   // 安卓中低端机：降级装饰层
   const lowEnd = useLowEnd()
@@ -337,7 +348,7 @@ export function Hero() {
       {/* 内容 */}
       {/* 内容（反向视差 + 渐隐） */}
       <m.div
-        style={{ y: yContent, opacity: fade }}
+        style={{ y: yContent, opacity: fade, skewY }}
         className="relative z-10 mx-auto w-full max-w-3xl px-5 pt-28 pb-52 text-center sm:px-6 sm:pb-64"
       >
         <m.p
@@ -397,18 +408,22 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.85 }}
           className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4"
         >
-          <a
-            href="#origin"
-            className="rounded-full bg-gradient-to-r from-ember-2 via-ember to-[#ffb066] px-7 py-3.5 text-sm font-semibold text-[#2a1202] shadow-[0_10px_34px_-8px_rgba(255,122,26,0.55)] transition-transform hover:scale-105 sm:px-8"
-          >
-            探索起源 →
-          </a>
-          <a
-            href="#cinema"
-            className="rounded-full border border-gold/45 px-7 py-3.5 text-sm font-semibold text-gold transition-colors hover:border-gold hover:bg-gold/10 sm:px-8"
-          >
-            🎬 今夜放映
-          </a>
+          <Magnetic>
+            <a
+              href="#origin"
+              className="rounded-full bg-gradient-to-r from-ember-2 via-ember to-[#ffb066] px-7 py-3.5 text-sm font-semibold text-[#2a1202] shadow-[0_10px_34px_-8px_rgba(255,122,26,0.55)] transition-transform hover:scale-105 sm:px-8"
+            >
+              探索起源 →
+            </a>
+          </Magnetic>
+          <Magnetic>
+            <a
+              href="#cinema"
+              className="rounded-full border border-gold/45 px-7 py-3.5 text-sm font-semibold text-gold transition-colors hover:border-gold hover:bg-gold/10 sm:px-8"
+            >
+              🎬 今夜放映
+            </a>
+          </Magnetic>
         </m.div>
       </m.div>
 

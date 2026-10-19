@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, m, useInView } from 'framer-motion'
+import {
+  AnimatePresence,
+  m,
+  useInView,
+  useMotionValue,
+  useScroll,
+  useSpring,
+  useTransform,
+  useVelocity,
+} from 'framer-motion'
 import { movies, type Movie } from '../data/movies'
 import { Poster } from './Poster'
 import { SceneVignette } from './SceneFX'
@@ -174,6 +183,82 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
   )
 }
 
+/** 海报卡：入场翻转 + 鼠标 3D 倾斜 + 光泽扫过 */
+function PosterCard({
+  mv,
+  i,
+  hover,
+  inView,
+  playing,
+  onOpen,
+}: {
+  mv: Movie
+  i: number
+  hover: boolean
+  inView: boolean
+  playing: boolean
+  onOpen: (m: Movie) => void
+}) {
+  const rx = useMotionValue(0)
+  const ry = useMotionValue(0)
+  const tiltX = useSpring(useTransform(ry, [-0.5, 0.5], [11, -11]), {
+    stiffness: 150,
+    damping: 14,
+  })
+  const tiltY = useSpring(useTransform(rx, [-0.5, 0.5], [-13, 13]), {
+    stiffness: 150,
+    damping: 14,
+  })
+  const hidden = { opacity: 0, y: 64, rotate: i % 2 ? 9 : -9, scale: 0.86 }
+
+  return (
+    <m.button
+      onClick={() => onOpen(mv)}
+      initial={hidden}
+      animate={inView ? { opacity: 1, y: 0, rotate: 0, scale: 1 } : hidden}
+      transition={revealTransition(playing, {
+        type: 'spring',
+        stiffness: 110,
+        damping: 14,
+        delay: (i % 4) * 0.12,
+      })}
+      whileHover={hover ? { y: -10, rotate: i % 2 ? -1.6 : 1.6, scale: 1.03 } : undefined}
+      whileTap={{ scale: 0.97 }}
+      style={hover ? { rotateX: tiltX, rotateY: tiltY, transformPerspective: 900 } : undefined}
+      onMouseMove={(e) => {
+        if (!hover) return
+        const r = e.currentTarget.getBoundingClientRect()
+        rx.set((e.clientX - r.left) / r.width - 0.5)
+        ry.set((e.clientY - r.top) / r.height - 0.5)
+      }}
+      onMouseLeave={() => {
+        rx.set(0)
+        ry.set(0)
+      }}
+      className="group relative overflow-hidden rounded-xl border border-gold/20 bg-ink-2 text-left shadow-[0_16px_40px_-16px_rgba(0,0,0,0.85)] transition-colors hover:border-ember/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ember"
+      aria-label={`查看《${mv.titleZh}》详情`}
+    >
+      <Poster movie={mv} className="block w-full" />
+      {/* 光泽扫过 */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background:
+            'linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.16) 45%, rgba(255,220,180,0.28) 52%, transparent 66%)',
+        }}
+      />
+      <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/95 via-black/35 to-transparent p-3 opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
+        <p className="text-[13px] font-semibold text-bone sm:text-sm">{mv.titleZh}</p>
+        <p className="mt-0.5 text-[11px] tracking-wider text-ember">▶ 播放预告</p>
+      </div>
+      {/* 票根角标 */}
+      <span className="absolute left-2 top-2 rounded-full border border-gold/40 bg-black/55 px-2 py-0.5 text-[8px] tracking-[0.22em] text-gold/90">
+        ADMIT ONE
+      </span>
+    </m.button>
+  )
+}
+
 export function Cinema() {
   const [active, setActive] = useState<Movie | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
@@ -181,6 +266,13 @@ export function Cinema() {
   // 招牌区与海报墙各自观察：向上滚时瞬间显示
   const head = useRevealState('-80px')
   const wall = useRevealState('-40px')
+  // 跑马灯随滚动速度“变速”
+  const { scrollY } = useScroll()
+  const vel = useVelocity(scrollY)
+  const marqueeBoost = useSpring(
+    useTransform(vel, [-4000, 4000], [170, -170], { clamp: true }),
+    { stiffness: 90, damping: 22 },
+  )
   // 跑马灯不在视口时暂停
   const marqueeRef = useRef<HTMLDivElement>(null)
   const marqueeInView = useInView(marqueeRef, { margin: '80px' })
@@ -243,15 +335,17 @@ export function Cinema() {
         </m.p>
       </div>
 
-      {/* 跑马灯 */}
+      {/* 跑马灯（滚动越快，位移越大） */}
       <div className="relative mt-10 overflow-hidden border-y border-gold/25 bg-black/35 py-3">
-        <div
-          ref={marqueeRef}
-          className={`marquee flex w-max whitespace-nowrap font-display text-sm tracking-[0.22em] text-gold/85 sm:text-base ${marqueeInView ? '' : 'is-paused'}`}
-        >
-          <span className="pr-8">{strip.repeat(2)}</span>
-          <span className="pr-8">{strip.repeat(2)}</span>
-        </div>
+        <m.div style={{ x: marqueeBoost }}>
+          <div
+            ref={marqueeRef}
+            className={`marquee flex w-max whitespace-nowrap font-display text-sm tracking-[0.22em] text-gold/85 sm:text-base ${marqueeInView ? '' : 'is-paused'}`}
+          >
+            <span className="pr-8">{strip.repeat(2)}</span>
+            <span className="pr-8">{strip.repeat(2)}</span>
+          </div>
+        </m.div>
       </div>
 
       {/* 海报墙 */}
@@ -261,36 +355,15 @@ export function Cinema() {
           className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-7"
         >
           {movies.map((mv, i) => (
-            <m.button
+            <PosterCard
               key={mv.id}
-              onClick={() => setActive(mv)}
-              initial={{ opacity: 0, y: 64, rotate: i % 2 ? 9 : -9, scale: 0.86 }}
-              animate={
-                wall.inView
-                  ? { opacity: 1, y: 0, rotate: 0, scale: 1 }
-                  : { opacity: 0, y: 64, rotate: i % 2 ? 9 : -9, scale: 0.86 }
-              }
-              transition={revealTransition(wall.playing, {
-                type: 'spring',
-                stiffness: 110,
-                damping: 14,
-                delay: (i % 4) * 0.12,
-              })}
-              whileHover={hover ? { y: -10, rotate: i % 2 ? -1.6 : 1.6, scale: 1.03 } : undefined}
-              whileTap={{ scale: 0.97 }}
-              className="group relative overflow-hidden rounded-xl border border-gold/20 bg-ink-2 text-left shadow-[0_16px_40px_-16px_rgba(0,0,0,0.85)] transition-colors hover:border-ember/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ember"
-              aria-label={`查看《${mv.titleZh}》详情`}
-            >
-              <Poster movie={mv} className="block w-full" />
-              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/95 via-black/35 to-transparent p-3 opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
-                <p className="text-[13px] font-semibold text-bone sm:text-sm">{mv.titleZh}</p>
-                <p className="mt-0.5 text-[11px] tracking-wider text-ember">▶ 播放预告</p>
-              </div>
-              {/* 票根角标 */}
-              <span className="absolute left-2 top-2 rounded-full border border-gold/40 bg-black/55 px-2 py-0.5 text-[8px] tracking-[0.22em] text-gold/90">
-                ADMIT ONE
-              </span>
-            </m.button>
+              mv={mv}
+              i={i}
+              hover={hover}
+              inView={wall.inView}
+              playing={wall.playing}
+              onOpen={setActive}
+            />
           ))}
         </div>
       </div>

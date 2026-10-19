@@ -9,12 +9,15 @@ import { Footer } from './components/Footer'
 import { LazyMotion, domAnimation } from 'framer-motion'
 import { ClickTreats } from './components/Ghosts'
 import { ScrollProgress } from './components/ScrollFX'
+import { ScrollPumpkin, TorchCursor } from './components/FX'
 
 export default function App() {
   return (
     <LazyMotion strict features={domAnimation}>
     <div className="grain min-h-screen bg-ink">
       <ScrollProgress />
+      <TorchCursor />
+      <ScrollPumpkin />
       <Nav />
       <main>
         <Hero />

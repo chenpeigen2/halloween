@@ -3,7 +3,7 @@ const browser = await chromium.launch()
 const ctx = await browser.newContext({ ...devices['iPhone 13'] })
 const page = await ctx.newPage()
 await page.addInitScript(() => document.addEventListener('DOMContentLoaded', () => (document.documentElement.style.scrollBehavior = 'auto')))
-await page.goto('http://localhost:5586/', { waitUntil: 'networkidle', timeout: 60000 })
+await page.goto('http://localhost:5585/', { waitUntil: 'networkidle', timeout: 60000 })
 await page.waitForTimeout(1200)
 
 // 渐进滚动（模拟真实手势）
