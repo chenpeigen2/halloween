@@ -1,4 +1,5 @@
 import { m } from 'framer-motion'
+import { useHoverCapable } from '../lib/env'
 
 export function SectionHead({
   kicker,
@@ -11,6 +12,8 @@ export function SectionHead({
   desc?: string
   en: string
 }) {
+  // 触屏用 tween：逐字 spring 在安卓上集成器开销大
+  const hover = useHoverCapable()
   return (
     <div className="mb-14 text-center">
       {/* 小标：淡入 + 两侧金线展开 */}
@@ -33,12 +36,11 @@ export function SectionHead({
             initial={{ opacity: 0, y: 28, rotate: i % 2 ? 7 : -7, scale: 0.8 }}
             whileInView={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
             viewport={{ margin: '-80px' }}
-            transition={{
-              delay: 0.12 + i * 0.07,
-              type: 'spring',
-              stiffness: 140,
-              damping: 12,
-            }}
+            transition={
+              hover
+                ? { delay: 0.12 + i * 0.07, type: 'spring', stiffness: 140, damping: 12 }
+                : { delay: 0.12 + i * 0.07, duration: 0.5 }
+            }
           >
             {ch === ' ' ? '\u00A0' : ch}
           </m.span>

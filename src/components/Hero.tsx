@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   m,
+  useInView,
   useScroll,
   useTransform,
   type MotionValue,
 } from 'framer-motion'
 import { AmbientGhosts, CandyRain } from './Ghosts'
-import { useLowEnd } from '../lib/env'
+import { useHoverCapable, useLowEnd } from '../lib/env'
 
 /* ---------------- 倒计时 ---------------- */
 function nextHalloween(): Date {
@@ -220,12 +221,47 @@ function ScatterTitle({ progress }: { progress: MotionValue<number> }) {
   )
 }
 
-/* ---------------- Hero ---------------- */
+/* ---------------- 倒计时（独立组件：每秒只有它重渲染，不拖累整棵 Hero） ---------------- */
 const pad = (v: number) => String(v).padStart(2, '0')
 
-export function Hero() {
+function Countdown() {
   const { days, hours, minutes, seconds } = useCountdown()
+  const cells: [number, string][] = [
+    [days, 'DAYS'],
+    [hours, 'HOURS'],
+    [minutes, 'MINUTES'],
+    [seconds, 'SECONDS'],
+  ]
+  return (
+    <m.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.8, delay: 0.65 }}
+      className="card card-frame mx-auto mt-10 w-fit px-5 py-5 sm:px-8 sm:py-6"
+    >
+      <p className="text-[10px] tracking-[0.5em] text-gold/80 uppercase">
+        Countdown to All Hallows' Eve
+      </p>
+      <div className="mt-5 flex items-start gap-3 sm:gap-7">
+        {cells.map(([v, label], i) => (
+          <div key={label} className="flex items-start gap-3 sm:gap-7">
+            {i > 0 && (
+              <span className="hidden font-display text-3xl leading-none text-ember/35 pt-2 select-none sm:block">·</span>
+            )}
+            <div className="flex flex-col items-center">
+              <span className="font-round text-3xl font-extrabold text-ember tabular-nums sm:text-5xl">
+                {pad(v)}
+              </span>
+              <span className="mt-1.5 text-[9px] tracking-[0.32em] text-ash">{label}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </m.div>
+  )
+}
 
+export function Hero() {
   // 视差：滚动时各层以不同速度移动
   const heroRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
@@ -237,24 +273,24 @@ export function Hero() {
 
   // 安卓中低端机：降级装饰层
   const lowEnd = useLowEnd()
-  const cells: [number, string][] = [
-    [days, 'DAYS'],
-    [hours, 'HOURS'],
-    [minutes, 'MINUTES'],
-    [seconds, 'SECONDS'],
-  ]
+  const hover = useHoverCapable()
+  // Hero 滚出视口后暂停装饰动画（滚动时省下大量 CPU）
+  const heroInView = useInView(heroRef, { margin: '120px' })
 
   return (
     <section
       ref={heroRef}
       id="top"
-      className="min-h-hero relative flex items-center justify-center overflow-hidden"
+      className={`min-h-hero relative flex items-center justify-center overflow-hidden ${heroInView ? '' : 'deco-paused'}`}
     >
       {/* 夜空 */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_62%_18%,#2c1a52_0%,#160e2c_38%,#0a0710_72%)]" />
       <StarBand stars={STARS_FAR} progress={scrollYProgress} xRange={[0, -40]} yRange={[0, -20]} />
       <StarBand stars={STARS_MID} progress={scrollYProgress} xRange={[0, 55]} yRange={[0, -45]} />
-      <StarBand stars={STARS_NEAR} progress={scrollYProgress} xRange={[0, -110]} yRange={[0, -80]} />
+      {/* 触屏省掉最近层：视差幅度最大、观感收益最小 */}
+      {hover && !lowEnd && (
+        <StarBand stars={STARS_NEAR} progress={scrollYProgress} xRange={[0, -110]} yRange={[0, -80]} />
+      )}
 
       {/* 月亮 */}
       <m.div
@@ -262,8 +298,15 @@ export function Hero() {
         className="pointer-events-none absolute top-[12%] right-[10%] sm:right-[14%]"
         aria-hidden="true"
       >
-        <div className="absolute -inset-16 rounded-full bg-gold/10 blur-3xl" />
-        <div className="absolute -inset-6 rounded-full bg-gold/15 blur-xl" />
+        {/* 光晕用渐变而非 blur 滤镜：首次光栅化便宜得多 */}
+        <div
+          className="pointer-events-none absolute -inset-16 rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(232,192,122,0.16) 0%, rgba(232,192,122,0) 70%)' }}
+        />
+        <div
+          className="pointer-events-none absolute -inset-6 rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(232,192,122,0.22) 0%, rgba(232,192,122,0) 72%)' }}
+        />
         <div className="relative h-28 w-28 rounded-full bg-gradient-to-b from-[#f6e8c8] to-[#cbb387] shadow-[0_0_90px_rgba(232,192,122,0.5)] sm:h-36 sm:w-36">
           <span className="absolute left-[22%] top-[30%] h-4 w-4 rounded-full bg-[#b89b6c]/60" />
           <span className="absolute right-[26%] top-[52%] h-6 w-6 rounded-full bg-[#b89b6c]/50" />
@@ -276,9 +319,15 @@ export function Hero() {
       <AmbientGhosts count={lowEnd ? 3 : 5} />
       {!lowEnd && <CandyRain count={7} />}
 
-      {/* 雾（移动端用小半径模糊） */}
-      <div className="fog absolute bottom-24 left-0 h-36 w-[70%] rounded-full bg-violet/10 blur-xl sm:blur-3xl" />
-      <div className="fog-slow absolute bottom-40 left-0 h-28 w-[85%] rounded-full bg-ember/10 blur-xl sm:blur-3xl" />
+      {/* 雾（渐变实现，无 blur 滤镜） */}
+      <div
+        className="fog absolute bottom-24 left-0 h-36 w-[70%] rounded-full"
+        style={{ background: 'radial-gradient(ellipse, rgba(167,139,250,0.15) 0%, rgba(167,139,250,0) 70%)' }}
+      />
+      <div
+        className="fog-slow absolute bottom-40 left-0 h-28 w-[85%] rounded-full"
+        style={{ background: 'radial-gradient(ellipse, rgba(255,140,66,0.13) 0%, rgba(255,140,66,0) 70%)' }}
+      />
 
       {/* 前景：古宅与墓园剪影（慢速视差） */}
       <m.div style={{ y: yLand }} className="absolute inset-x-0 bottom-0">
@@ -306,7 +355,17 @@ export function Hero() {
           transition={{ duration: 1, ease: 'easeOut' }}
           className="mt-6"
         >
-          <ScatterTitle progress={scrollYProgress} />
+          {hover ? (
+            <ScatterTitle progress={scrollYProgress} />
+          ) : (
+            /* 触屏：不逐字散开（省 36 个滚动 transform），观感几乎一致 */
+            <h1
+              className="font-display text-[clamp(2.6rem,12vw,3.6rem)] leading-[1.02] tracking-[0.02em] sm:text-[6.4rem]"
+              aria-label="HALLOWEEN"
+            >
+              <span className="text-ember-grad text-stroke-dark inline-block">HALLOWEEN</span>
+            </h1>
+          )}
         </m.div>
 
         <m.p
@@ -329,32 +388,7 @@ export function Hero() {
           今夜，我们依然点亮南瓜灯——为黑暗中的来客，也为屏幕前的你。
         </m.p>
 
-        {/* 倒计时 */}
-        <m.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.65 }}
-          className="card card-frame mx-auto mt-10 w-fit px-5 py-5 sm:px-8 sm:py-6"
-        >
-          <p className="text-[10px] tracking-[0.5em] text-gold/80 uppercase">
-            Countdown to All Hallows' Eve
-          </p>
-          <div className="mt-5 flex items-start gap-3 sm:gap-7">
-            {cells.map(([v, label], i) => (
-              <div key={label} className="flex items-start gap-3 sm:gap-7">
-                {i > 0 && (
-                  <span className="hidden font-display text-3xl leading-none text-ember/35 pt-2 select-none sm:block">·</span>
-                )}
-                <div className="flex flex-col items-center">
-                  <span className="font-round text-3xl font-extrabold text-ember tabular-nums sm:text-5xl">
-                    {pad(v)}
-                  </span>
-                  <span className="mt-1.5 text-[9px] tracking-[0.32em] text-ash">{label}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </m.div>
+        <Countdown />
 
         {/* 按钮 */}
         <m.div

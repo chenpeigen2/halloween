@@ -15,7 +15,7 @@
   --font-display: 'Creepster', 'ZCOOL KuaiLe', 'Baloo 2', cursive;
   --font-cute: 'ZCOOL KuaiLe', 'Baloo 2', 'Noto Sans SC', sans-serif;
   --font-round: 'Baloo 2', 'ZCOOL KuaiLe', 'Noto Sans SC', sans-serif;
-  --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, 'PingFang SC', 'HarmonyOS Sans SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
 }
 
 /* ---------- 兼容层（旧 iOS / 鸿蒙 WebView）---------- */
@@ -291,6 +291,27 @@ body {
   background-image: radial-gradient(circle, #ffd9a0 0 2px, transparent 2.6px);
   background-size: 26px 26px;
   background-position: center;
+}
+
+/* ---------- 滚动时暂停不可见区域的动画 ---------- */
+.deco-paused .bat,
+.deco-paused .bat .wing,
+.deco-paused .candy-drift,
+.deco-paused .bob,
+.deco-paused .blink,
+.deco-paused .glow-svg {
+  animation-play-state: paused;
+}
+.marquee.is-paused {
+  animation-play-state: paused;
+}
+
+/*安卓合成器滚动：clip 不制造滚动容器（hidden 可能把滚动逼回主线程） */
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
 }
 
 /* ---------- 手机/触屏性能：关掉昂贵的持续动画/滤镜 ---------- */

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, m } from 'framer-motion'
+import { AnimatePresence, m, useInView } from 'framer-motion'
 import { movies, type Movie } from '../data/movies'
 import { Poster } from './Poster'
 import { SceneVignette } from './SceneFX'
@@ -177,6 +177,9 @@ export function Cinema() {
   const [active, setActive] = useState<Movie | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
   const hover = useHoverCapable()
+  // 跑马灯不在视口时暂停
+  const marqueeRef = useRef<HTMLDivElement>(null)
+  const marqueeInView = useInView(marqueeRef, { margin: '80px' })
   const strip = 'NOW SHOWING · 今夜放映 · TRICK OR TREAT · 午夜场 · 不给糖就捣蛋 · '
 
   return (
@@ -228,7 +231,10 @@ export function Cinema() {
 
       {/* 跑马灯 */}
       <div className="relative mt-10 overflow-hidden border-y border-gold/25 bg-black/35 py-3">
-        <div className="marquee flex w-max whitespace-nowrap font-display text-sm tracking-[0.22em] text-gold/85 sm:text-base">
+        <div
+          ref={marqueeRef}
+          className={`marquee flex w-max whitespace-nowrap font-display text-sm tracking-[0.22em] text-gold/85 sm:text-base ${marqueeInView ? '' : 'is-paused'}`}
+        >
           <span className="pr-8">{strip.repeat(2)}</span>
           <span className="pr-8">{strip.repeat(2)}</span>
         </div>
