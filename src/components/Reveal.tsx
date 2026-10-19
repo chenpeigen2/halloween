@@ -1,6 +1,19 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { motion, useInView } from 'framer-motion'
 
+/** 手机端跳过 blur 动画（blur 在移动端 GPU 上很贵） */
+function useDesktop() {
+  const [desktop, setDesktop] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 640px)')
+    const sync = () => setDesktop(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
+  return desktop
+}
+
 type RevealProps = {
   children: ReactNode
   className?: string
@@ -23,6 +36,8 @@ export function Reveal({
   scale = 1,
   blur = true,
 }: RevealProps) {
+  const desktop = useDesktop()
+  const useBlur = blur && desktop
   return (
     <motion.div
       className={className}
@@ -32,7 +47,7 @@ export function Reveal({
         x,
         rotate,
         scale,
-        filter: blur ? 'blur(10px)' : 'blur(0px)',
+        filter: useBlur ? 'blur(10px)' : 'blur(0px)',
       }}
       whileInView={{
         opacity: 1,

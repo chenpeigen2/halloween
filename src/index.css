@@ -139,7 +139,7 @@ body {
 .grain::after {
   content: '';
   position: fixed;
-  inset: -50%;
+  inset: -10%;
   pointer-events: none;
   z-index: 60;
   opacity: 0.045;
@@ -191,12 +191,22 @@ body {
 }
 .candy-drift { animation: candy-drift linear infinite; }
 
-/* ---------- 月晕呼吸 ---------- */
+/* ---------- 南瓜灯呼吸光（文字阴影版，比 filter 便宜）---------- */
 @keyframes glow-pulse {
-  0%, 100% { filter: drop-shadow(0 0 14px rgba(255, 140, 66, 0.5)); }
-  50% { filter: drop-shadow(0 0 36px rgba(255, 140, 66, 0.9)); }
+  0%, 100% { text-shadow: 0 0 12px rgba(255, 140, 66, 0.5); }
+  50% { text-shadow: 0 0 30px rgba(255, 140, 66, 0.9); }
 }
 .glow { animation: glow-pulse 3.4s ease-in-out infinite; }
+
+/* SVG 专用：静态辉光 +（桌面）脉动 */
+@keyframes glow-pulse-svg {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(255, 140, 66, 0.5)); }
+  50% { filter: drop-shadow(0 0 30px rgba(255, 140, 66, 0.9)); }
+}
+.glow-svg {
+  filter: drop-shadow(0 0 18px rgba(255, 140, 66, 0.7));
+  animation: glow-pulse-svg 3.4s ease-in-out infinite;
+}
 
 /* ---------- 蝙蝠飞行 ---------- */
 @keyframes bat-fly {
@@ -254,9 +264,40 @@ body {
   background-position: center;
 }
 
+/* ---------- 手机端性能：关掉昂贵的持续动画/滤镜 ---------- */
+@media (max-width: 639px) {
+  .grain::after {
+    animation: none;
+    inset: 0;
+    opacity: 0.03;
+  }
+  .twinkle {
+    animation: none !important;
+  }
+  .card {
+    backdrop-filter: none;
+    background: rgba(18, 12, 30, 0.88);
+  }
+  /* 导航不再每帧重糊背后的滚动内容 */
+  header {
+    backdrop-filter: none !important;
+    background: rgba(10, 7, 16, 0.97) !important;
+  }
+  /* 雾改为静态光斑 */
+  .fog, .fog-slow {
+    animation: none !important;
+  }
+  .glow-svg {
+    animation: none;
+  }
+  .bob {
+    animation-duration: 8s;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .fog, .fog-slow, .bob, .glow, .marquee, .grain::after, .bat, .bat .wing, .neon, .twinkle, .blink, .candy-drift {
+  .fog, .fog-slow, .bob, .glow, .glow-svg, .marquee, .grain::after, .bat, .bat .wing, .neon, .twinkle, .blink, .candy-drift {
     animation: none !important;
   }
 }

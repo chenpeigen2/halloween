@@ -31,10 +31,10 @@ export function SceneVignette({
       className="pointer-events-none fixed inset-0 z-[5]"
       style={{ opacity, background: overlay }}
     >
-      {/* 舞台追光锥（仅 cinema） */}
+      {/* 舞台追光锥（仅 cinema · 桌面端；移动端省略重滤镜） */}
       {variant === 'cinema' && (
         <div
-          className="absolute left-1/2 top-[-8vh] h-[72vh] w-[72vw] -translate-x-1/2 blur-2xl"
+          className="absolute left-1/2 top-[-8vh] hidden h-[72vh] w-[72vw] -translate-x-1/2 blur-2xl sm:block"
           style={{
             background:
               'conic-gradient(from 158deg at 50% 0%, transparent 42%, rgba(255,196,140,0.12) 50%, transparent 58%)',

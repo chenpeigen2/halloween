@@ -227,8 +227,8 @@ export function Cinema() {
       {/* 跑马灯 */}
       <div className="relative mt-10 overflow-hidden border-y border-gold/25 bg-black/35 py-3">
         <div className="marquee flex w-max whitespace-nowrap font-display text-sm tracking-[0.22em] text-gold/85 sm:text-base">
-          <span className="pr-8">{strip.repeat(4)}</span>
-          <span className="pr-8">{strip.repeat(4)}</span>
+          <span className="pr-8">{strip.repeat(2)}</span>
+          <span className="pr-8">{strip.repeat(2)}</span>
         </div>
       </div>
 

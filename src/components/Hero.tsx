@@ -51,20 +51,18 @@ function StarBand({
   progress,
   xRange,
   yRange = [0, 0],
-  glow,
 }: {
   stars: ReturnType<typeof makeStars>
   progress: MotionValue<number>
   xRange: [number, number]
   yRange?: [number, number]
-  glow?: string
 }) {
   const x = useTransform(progress, [0, 1], xRange)
   const y = useTransform(progress, [0, 1], yRange)
   return (
     <motion.div
       className="pointer-events-none absolute inset-0"
-      style={{ x, y, filter: glow ? `drop-shadow(0 0 6px ${glow})` : undefined }}
+      style={{ x, y }}
       aria-hidden="true"
     >
       {stars.map((s) => (
@@ -170,7 +168,7 @@ function Landscape() {
       {/* 发光南瓜灯（会眨眼） */}
       <g transform="translate(1080 196)">
         <ellipse cx="0" cy="56" rx="46" ry="8" fill="#ff8c42" opacity="0.16" />
-        <path className="glow" d="M-38 22c0-20 17-32 38-32s38 12 38 32-17 32-38 32-38-12-38-32z" fill="#ff6a00" opacity="0.92" />
+        <path className="glow-svg" d="M-38 22c0-20 17-32 38-32s38 12 38 32-17 32-38 32-38-12-38-32z" fill="#ff6a00" opacity="0.92" />
         <path d="M-2 12q-3-14 8-18-3 8 2 18z" fill="#3f7d2f" />
         <g className="blink">
           <path d="M-19 12l11 6-11 4z M19 12l-11 6 11 4z M0 18l-6 10h12z" fill="#210f02" />
@@ -251,8 +249,8 @@ export function Hero() {
       {/* 夜空 */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_62%_18%,#2c1a52_0%,#160e2c_38%,#0a0710_72%)]" />
       <StarBand stars={STARS_FAR} progress={scrollYProgress} xRange={[0, -40]} yRange={[0, -20]} />
-      <StarBand stars={STARS_MID} progress={scrollYProgress} xRange={[0, 55]} yRange={[0, -45]} glow="rgba(167,139,250,0.8)" />
-      <StarBand stars={STARS_NEAR} progress={scrollYProgress} xRange={[0, -110]} yRange={[0, -80]} glow="rgba(255,196,140,0.9)" />
+      <StarBand stars={STARS_MID} progress={scrollYProgress} xRange={[0, 55]} yRange={[0, -45]} />
+      <StarBand stars={STARS_NEAR} progress={scrollYProgress} xRange={[0, -110]} yRange={[0, -80]} />
 
       {/* 月亮 */}
       <motion.div
@@ -274,9 +272,9 @@ export function Hero() {
       <AmbientGhosts count={5} />
       <CandyRain count={7} />
 
-      {/* 雾 */}
-      <div className="fog absolute bottom-24 left-0 h-36 w-[70%] rounded-full bg-violet/10 blur-3xl" />
-      <div className="fog-slow absolute bottom-40 left-0 h-28 w-[85%] rounded-full bg-ember/10 blur-3xl" />
+      {/* 雾（移动端用小半径模糊） */}
+      <div className="fog absolute bottom-24 left-0 h-36 w-[70%] rounded-full bg-violet/10 blur-xl sm:blur-3xl" />
+      <div className="fog-slow absolute bottom-40 left-0 h-28 w-[85%] rounded-full bg-ember/10 blur-xl sm:blur-3xl" />
 
       {/* 前景：古宅与墓园剪影（慢速视差） */}
       <motion.div style={{ y: yLand }} className="absolute inset-x-0 bottom-0">
