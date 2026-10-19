@@ -1,18 +1,6 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { motion, useInView } from 'framer-motion'
-
-/** 手机端跳过 blur 动画（blur 在移动端 GPU 上很贵） */
-function useDesktop() {
-  const [desktop, setDesktop] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 640px)')
-    const sync = () => setDesktop(mq.matches)
-    sync()
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
-  }, [])
-  return desktop
-}
+import { useEffect, useRef, type ReactNode } from 'react'
+import { m, useInView } from 'framer-motion'
+import { useMediaQuery } from '../lib/env'
 
 type RevealProps = {
   children: ReactNode
@@ -36,10 +24,11 @@ export function Reveal({
   scale = 1,
   blur = true,
 }: RevealProps) {
-  const desktop = useDesktop()
-  const useBlur = blur && desktop
+  // blur 只在"宽屏 + 鼠标设备"上启用：触屏/安卓 GPU 滤镜太贵
+  const strongGpu = useMediaQuery('(min-width: 1024px) and (hover: hover)')
+  const useBlur = blur && strongGpu
   return (
-    <motion.div
+    <m.div
       className={className}
       initial={{
         opacity: 0,
@@ -61,11 +50,11 @@ export function Reveal({
       transition={{ duration: 0.75, delay, ease: [0.2, 0.7, 0.2, 1] }}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
-/** 滚动到视口时从 0 滚到目标数字 */
+/** 滚动到视口时从 0 滚到目标数字（直接写 DOM，不触发 React 重渲染） */
 export function CountUp({
   to,
   duration = 1.8,
@@ -79,29 +68,30 @@ export function CountUp({
 }) {
   const ref = useRef<HTMLSpanElement>(null)
   const inView = useInView(ref, { margin: '-60px' })
-  const [v, setV] = useState(0)
 
   useEffect(() => {
-    if (!inView) return
-    let raf = 0
+    const el = ref.current
+    if (!el || !inView) return
+    const fmt = (v: number) => (decimals ? v.toFixed(decimals) : String(Math.round(v)))
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      raf = requestAnimationFrame(() => setV(to))
-      return () => cancelAnimationFrame(raf)
+      el.textContent = fmt(to) + suffix
+      return
     }
+    let raf = 0
     const t0 = performance.now()
     const tick = (t: number) => {
       const p = Math.min(1, (t - t0) / (duration * 1000))
-      setV(to * (1 - Math.pow(1 - p, 3)))
+      el.textContent = fmt(to * (1 - Math.pow(1 - p, 3))) + suffix
       if (p < 1) raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [inView, to, duration])
+  }, [inView, to, duration, decimals, suffix])
 
   return (
     <span ref={ref} className="tabular-nums">
-      {v.toFixed(decimals)}
-      {suffix}
+      0{suffix}
     </span>
   )
 }

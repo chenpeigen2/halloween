@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 
 export function SectionHead({
   kicker,
@@ -14,7 +14,7 @@ export function SectionHead({
   return (
     <div className="mb-14 text-center">
       {/* 小标：淡入 + 两侧金线展开 */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ margin: '-80px' }}
@@ -22,12 +22,12 @@ export function SectionHead({
         className="kicker"
       >
         {en}
-      </motion.div>
+      </m.div>
 
       {/* 标题：逐字弹入 */}
       <h2 className="text-stroke-soft mt-5 font-cute text-3xl font-bold tracking-[0.14em] text-bone sm:text-[2.6rem]">
         {[...title].map((ch, i) => (
-          <motion.span
+          <m.span
             key={`${ch}-${i}`}
             className="inline-block"
             initial={{ opacity: 0, y: 28, rotate: i % 2 ? 7 : -7, scale: 0.8 }}
@@ -41,12 +41,12 @@ export function SectionHead({
             }}
           >
             {ch === ' ' ? '\u00A0' : ch}
-          </motion.span>
+          </m.span>
         ))}
       </h2>
 
       {/* 装饰线：从中间向两侧展开 */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scaleX: 0.2 }}
         whileInView={{ opacity: 1, scaleX: 1 }}
         viewport={{ margin: '-80px' }}
@@ -54,10 +54,10 @@ export function SectionHead({
         className="rule-orn mt-5 text-gold"
       >
         <span className="text-lg opacity-90">{kicker}</span>
-      </motion.div>
+      </m.div>
 
       {desc && (
-        <motion.p
+        <m.p
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ margin: '-80px' }}
@@ -65,7 +65,7 @@ export function SectionHead({
           className="mx-auto mt-5 max-w-2xl text-[15px] leading-8 text-ash"
         >
           {desc}
-        </motion.p>
+        </m.p>
       )}
     </div>
   )

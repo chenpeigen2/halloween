@@ -18,9 +18,29 @@
   --font-body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
 }
 
+/* ---------- 兼容层（旧 iOS / 鸿蒙 WebView）---------- */
+/* 100svh 渐进增强：不支持 svh 的旧内核回退到 100vh */
+.min-h-hero {
+  min-height: 100vh;
+}
+@supports (min-height: 100svh) {
+  .min-h-hero {
+    min-height: 100svh;
+  }
+}
+
+/* 刘海屏安全区（需要 viewport-fit=cover）*/
+header {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.safe-b {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -103,18 +123,24 @@ body {
   backdrop-filter: blur(10px);
   transition: translate 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.45s, box-shadow 0.45s;
 }
-.card:hover {
-  translate: 0 -6px;
-  border-color: rgba(255, 140, 66, 0.45);
-  box-shadow:
-    0 24px 60px -18px rgba(255, 122, 26, 0.32),
-    0 0 0 1px rgba(255, 140, 66, 0.08) inset;
+/* 悬停效果只给真鼠标：触屏安卓 :hover 会粘住 */
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    translate: 0 -6px;
+    border-color: rgba(255, 140, 66, 0.45);
+    box-shadow:
+      0 24px 60px -18px rgba(255, 122, 26, 0.32),
+      0 0 0 1px rgba(255, 140, 66, 0.08) inset;
+  }
 }
 
 .card-frame::before {
   content: '';
   position: absolute;
-  inset: 10px;
+  top: 10px;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
   border: 1px solid rgba(232, 192, 122, 0.16);
   border-radius: 1.25rem;
   pointer-events: none;
@@ -139,7 +165,10 @@ body {
 .grain::after {
   content: '';
   position: fixed;
-  inset: -10%;
+  top: -10%;
+  right: -10%;
+  bottom: -10%;
+  left: -10%;
   pointer-events: none;
   z-index: 60;
   opacity: 0.045;
@@ -264,15 +293,23 @@ body {
   background-position: center;
 }
 
-/* ---------- 手机端性能：关掉昂贵的持续动画/滤镜 ---------- */
-@media (max-width: 639px) {
+/* ---------- 手机/触屏性能：关掉昂贵的持续动画/滤镜 ---------- */
+@media (max-width: 639px), (hover: none) {
   .grain::after {
     animation: none;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     opacity: 0.03;
   }
   .twinkle {
     animation: none !important;
+  }
+  /* iOS：emoji 阴影动画会逐帧重绘位图字形，改静态光 */
+  .glow {
+    animation: none;
+    text-shadow: 0 0 16px rgba(255, 140, 66, 0.7);
   }
   .card {
     backdrop-filter: none;

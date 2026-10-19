@@ -6,11 +6,13 @@ import { Customs } from './components/Customs'
 import { Symbols } from './components/Symbols'
 import { Cinema } from './components/Cinema'
 import { Footer } from './components/Footer'
+import { LazyMotion, domAnimation } from 'framer-motion'
 import { ClickTreats } from './components/Ghosts'
 import { ScrollProgress } from './components/ScrollFX'
 
 export default function App() {
   return (
+    <LazyMotion strict features={domAnimation}>
     <div className="grain min-h-screen bg-ink">
       <ScrollProgress />
       <Nav />
@@ -25,5 +27,6 @@ export default function App() {
       <Footer />
       <ClickTreats />
     </div>
+    </LazyMotion>
   )
 }

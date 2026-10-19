@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { motion, useScroll, useSpring } from 'framer-motion'
+import { m, useScroll, useSpring } from 'framer-motion'
 import { SectionHead } from './SectionHead'
 import { SceneVignette } from './SceneFX'
 
@@ -90,7 +90,7 @@ export function Timeline() {
 
       <div ref={spineRef} className="relative mx-auto max-w-4xl px-6">
         {/* 发光中轴（随滚动生长） */}
-        <motion.div
+        <m.div
           className="absolute inset-y-0 left-[calc(50%-0.5px)] hidden w-px sm:block"
           aria-hidden="true"
           style={{
@@ -104,7 +104,7 @@ export function Timeline() {
 
         <ol className="space-y-9">
           {events.map((e, i) => (
-            <motion.li
+            <m.li
               key={e.title}
               initial={{ opacity: 0, x: e.side === 'left' ? -40 : 40 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -134,12 +134,12 @@ export function Timeline() {
                 style={{ boxShadow: '0 0 16px rgba(255,140,66,0.8)' }}
               />
               <span className="hidden sm:block sm:w-1/2" />
-            </motion.li>
+            </m.li>
           ))}
         </ol>
 
         {/* 收尾 */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scaleX: 0.2 }}
           whileInView={{ opacity: 1, scaleX: 1 }}
           viewport={{ margin: '-60px' }}
@@ -147,7 +147,7 @@ export function Timeline() {
           className="rule-orn mt-14 text-gold"
         >
           <span className="text-sm tracking-[0.5em]">FIN</span>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   )

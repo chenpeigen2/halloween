@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { SectionHead } from './SectionHead'
 
 const customs = [
@@ -58,7 +58,7 @@ export function Customs() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {customs.map((c, i) => (
-            <motion.article
+            <m.article
               key={c.title}
               initial={{ opacity: 0, y: 36, rotate: i % 2 ? 2.5 : -2.5 }}
               whileInView={{ opacity: 1, y: 0, rotate: 0 }}
@@ -77,7 +77,7 @@ export function Customs() {
               <h3 className="mt-5 font-cute text-lg font-semibold text-bone">{c.title}</h3>
               <div className="mt-2.5 h-px w-10 bg-ember/70 transition-all duration-500 group-hover:w-20" />
               <p className="mt-3 text-sm leading-7 text-ash">{c.body}</p>
-            </motion.article>
+            </m.article>
           ))}
         </div>
       </div>

@@ -1,5 +1,5 @@
 import type { RefObject } from 'react'
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion'
+import { m, useScroll, useSpring, useTransform } from 'framer-motion'
 
 /**
  * 滚动驱动的场景氛围：进入某板块时渐入聚光/暗角，离开时渐隐。
@@ -26,7 +26,7 @@ export function SceneVignette({
       : 'radial-gradient(ellipse at 50% 45%, rgba(167,139,250,0.13) 0%, rgba(10,7,20,0.5) 52%, rgba(6,4,12,0.85) 100%)'
 
   return (
-    <motion.div
+    <m.div
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 z-[5]"
       style={{ opacity, background: overlay }}
@@ -41,6 +41,6 @@ export function SceneVignette({
           }}
         />
       )}
-    </motion.div>
+    </m.div>
   )
 }

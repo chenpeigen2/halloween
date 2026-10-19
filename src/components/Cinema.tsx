@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { movies, type Movie } from '../data/movies'
 import { Poster } from './Poster'
 import { SceneVignette } from './SceneFX'
+import { useHoverCapable } from '../lib/env'
 
 type TrailerState = 'idle' | 'probing' | 'playing' | 'offline'
 
@@ -40,7 +41,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
   }
 
   return (
-    <motion.div
+    <m.div
       className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -51,12 +52,12 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
     >
       <div className="absolute inset-0 bg-black/88 backdrop-blur-md" onClick={onClose} />
 
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 40, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 30, scale: 0.97 }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
-        className="relative z-10 max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-2xl border border-gold/30 bg-ink-2 shadow-[0_0_100px_rgba(255,140,66,0.16)] sm:flex"
+        className="safe-b relative z-10 max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-2xl border border-gold/30 bg-ink-2 shadow-[0_0_100px_rgba(255,140,66,0.16)] sm:flex"
       >
         {/* 海报：手机端限宽居中，桌面端占左栏 */}
         <div className="shrink-0 bg-black/30 p-5 sm:w-[38%] sm:p-0">
@@ -98,7 +99,7 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
           <div className="mt-6 rounded-xl border border-gold/15 bg-black/25 p-3 sm:p-4">
             <AnimatePresence mode="wait">
               {trailer === 'idle' && (
-                <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <m.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <button
                     onClick={play}
                     className="flex w-full items-center justify-center gap-3 rounded-lg bg-gradient-to-r from-ember-2 via-ember to-[#ffb066] px-5 py-3.5 font-semibold text-[#2a1202] transition-transform hover:scale-[1.02]"
@@ -108,11 +109,11 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
                   <p className="mt-2.5 text-center text-[11px] text-ash/70">
                     预告片来自 YouTube，点击后开始加载
                   </p>
-                </motion.div>
+                </m.div>
               )}
 
               {trailer === 'probing' && (
-                <motion.div
+                <m.div
                   key="probing"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -121,11 +122,11 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
                 >
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-ember border-t-transparent" />
                   正在连接放映厅…
-                </motion.div>
+                </m.div>
               )}
 
               {trailer === 'playing' && (
-                <motion.div
+                <m.div
                   key="playing"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -139,11 +140,11 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
                     allowFullScreen
                   />
-                </motion.div>
+                </m.div>
               )}
 
               {trailer === 'offline' && (
-                <motion.div
+                <m.div
                   key="offline"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -162,19 +163,20 @@ function MovieModal({ movie, onClose }: { movie: Movie; onClose: () => void }) {
                   >
                     在 YouTube 打开 ↗
                   </a>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   )
 }
 
 export function Cinema() {
   const [active, setActive] = useState<Movie | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
+  const hover = useHoverCapable()
   const strip = 'NOW SHOWING · 今夜放映 · TRICK OR TREAT · 午夜场 · 不给糖就捣蛋 · '
 
   return (
@@ -203,7 +205,7 @@ export function Cinema() {
       {/* 霓虹招牌 */}
       <div className="relative mx-auto max-w-6xl px-5 pt-16 text-center sm:px-16">
         <p className="kicker">Halloween Cinema</p>
-        <motion.h2
+        <m.h2
           initial={{ opacity: 0, scale: 0.82, filter: 'blur(12px)' }}
           whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
           viewport={{ margin: '-80px' }}
@@ -212,8 +214,8 @@ export function Cinema() {
           style={{ textShadow: '0 0 18px rgba(255,122,26,0.65), 0 0 60px rgba(255,122,26,0.35)' }}
         >
           万圣节 CINEMA
-        </motion.h2>
-        <motion.p
+        </m.h2>
+        <m.p
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ margin: '-70px' }}
@@ -221,7 +223,7 @@ export function Cinema() {
           className="mx-auto mt-5 max-w-xl text-sm leading-7 text-ash sm:text-[15px]"
         >
           八部定义了万圣节夜晚的经典恐怖片。点开海报，看看你敢不敢按下播放。
-        </motion.p>
+        </m.p>
       </div>
 
       {/* 跑马灯 */}
@@ -235,29 +237,29 @@ export function Cinema() {
       {/* 海报墙 */}
       <div className="relative mx-auto max-w-6xl px-5 pt-12 sm:px-10">
         <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4 lg:gap-7">
-          {movies.map((m, i) => (
-            <motion.button
-              key={m.id}
-              onClick={() => setActive(m)}
+          {movies.map((mv, i) => (
+            <m.button
+              key={mv.id}
+              onClick={() => setActive(mv)}
               initial={{ opacity: 0, y: 64, rotate: i % 2 ? 9 : -9, scale: 0.86 }}
               whileInView={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
               viewport={{ margin: '-40px' }}
               transition={{ type: 'spring', stiffness: 110, damping: 14, delay: (i % 4) * 0.12 }}
-              whileHover={{ y: -10, rotate: i % 2 ? -1.6 : 1.6, scale: 1.03 }}
+              whileHover={hover ? { y: -10, rotate: i % 2 ? -1.6 : 1.6, scale: 1.03 } : undefined}
               whileTap={{ scale: 0.97 }}
               className="group relative overflow-hidden rounded-xl border border-gold/20 bg-ink-2 text-left shadow-[0_16px_40px_-16px_rgba(0,0,0,0.85)] transition-colors hover:border-ember/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ember"
-              aria-label={`查看《${m.titleZh}》详情`}
+              aria-label={`查看《${mv.titleZh}》详情`}
             >
-              <Poster movie={m} className="block w-full" />
+              <Poster movie={mv} className="block w-full" />
               <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/95 via-black/35 to-transparent p-3 opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
-                <p className="text-[13px] font-semibold text-bone sm:text-sm">{m.titleZh}</p>
+                <p className="text-[13px] font-semibold text-bone sm:text-sm">{mv.titleZh}</p>
                 <p className="mt-0.5 text-[11px] tracking-wider text-ember">▶ 播放预告</p>
               </div>
               {/* 票根角标 */}
               <span className="absolute left-2 top-2 rounded-full border border-gold/40 bg-black/55 px-2 py-0.5 text-[8px] tracking-[0.22em] text-gold/90">
                 ADMIT ONE
               </span>
-            </motion.button>
+            </m.button>
           ))}
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { SectionHead } from './SectionHead'
 import { CountUp, Reveal } from './Reveal'
 
@@ -49,7 +49,7 @@ export function Origin() {
 
       <div className="grid gap-7 sm:grid-cols-2">
         {blocks.map((b, i) => (
-          <motion.article
+          <m.article
             key={b.title}
             variants={fade}
             initial="hidden"
@@ -66,7 +66,7 @@ export function Origin() {
             <p className="mt-5 inline-block rounded-full border border-ember/35 bg-ember/10 px-4 py-1.5 text-xs tracking-wider text-ember">
               ✦ {b.highlight}
             </p>
-          </motion.article>
+          </m.article>
         ))}
       </div>
       {/* 数据彩蛋：滚动到此数字从 0 跳起来 */}

@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  motion,
+  m,
   useScroll,
   useTransform,
   type MotionValue,
 } from 'framer-motion'
 import { AmbientGhosts, CandyRain } from './Ghosts'
+import { useLowEnd } from '../lib/env'
 
 /* ---------------- 倒计时 ---------------- */
 function nextHalloween(): Date {
@@ -60,7 +61,7 @@ function StarBand({
   const x = useTransform(progress, [0, 1], xRange)
   const y = useTransform(progress, [0, 1], yRange)
   return (
-    <motion.div
+    <m.div
       className="pointer-events-none absolute inset-0"
       style={{ x, y }}
       aria-hidden="true"
@@ -79,7 +80,7 @@ function StarBand({
           }}
         />
       ))}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -92,10 +93,10 @@ const BATS = [
   { top: '18%', size: 26, dur: 31, delay: 24 },
 ]
 
-function Bats() {
+function Bats({ count = 5 }: { count?: number }) {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-      {BATS.map((b) => (
+      {BATS.slice(0, count).map((b) => (
         <div
           key={`${b.top}-${b.size}`}
           className="bat absolute"
@@ -197,12 +198,12 @@ function ScatterChar({
   const opacity = useTransform(progress, [0, 0.55], [1, 0])
 
   return (
-    <motion.span
+    <m.span
       className="text-ember-grad text-stroke-dark inline-block"
       style={{ y, x, rotate, opacity }}
     >
       {ch}
-    </motion.span>
+    </m.span>
   )
 }
 
@@ -233,6 +234,9 @@ export function Hero() {
   const yContent = useTransform(scrollYProgress, [0, 1], [0, 130])
   const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0])
   const scaleMoon = useTransform(scrollYProgress, [0, 1], [1, 1.18])
+
+  // 安卓中低端机：降级装饰层
+  const lowEnd = useLowEnd()
   const cells: [number, string][] = [
     [days, 'DAYS'],
     [hours, 'HOURS'],
@@ -244,7 +248,7 @@ export function Hero() {
     <section
       ref={heroRef}
       id="top"
-      className="relative flex min-h-screen items-center justify-center overflow-hidden"
+      className="min-h-hero relative flex items-center justify-center overflow-hidden"
     >
       {/* 夜空 */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_62%_18%,#2c1a52_0%,#160e2c_38%,#0a0710_72%)]" />
@@ -253,7 +257,7 @@ export function Hero() {
       <StarBand stars={STARS_NEAR} progress={scrollYProgress} xRange={[0, -110]} yRange={[0, -80]} />
 
       {/* 月亮 */}
-      <motion.div
+      <m.div
         style={{ y: yMoon, scale: scaleMoon }}
         className="pointer-events-none absolute top-[12%] right-[10%] sm:right-[14%]"
         aria-hidden="true"
@@ -266,55 +270,55 @@ export function Hero() {
           <span className="absolute left-[46%] top-[18%] h-2.5 w-2.5 rounded-full bg-[#b89b6c]/60" />
           <span className="absolute left-[16%] top-[62%] h-3 w-3 rounded-full bg-[#b89b6c]/55" />
         </div>
-      </motion.div>
+      </m.div>
 
-      <Bats />
-      <AmbientGhosts count={5} />
-      <CandyRain count={7} />
+      <Bats count={lowEnd ? 2 : 5} />
+      <AmbientGhosts count={lowEnd ? 3 : 5} />
+      {!lowEnd && <CandyRain count={7} />}
 
       {/* 雾（移动端用小半径模糊） */}
       <div className="fog absolute bottom-24 left-0 h-36 w-[70%] rounded-full bg-violet/10 blur-xl sm:blur-3xl" />
       <div className="fog-slow absolute bottom-40 left-0 h-28 w-[85%] rounded-full bg-ember/10 blur-xl sm:blur-3xl" />
 
       {/* 前景：古宅与墓园剪影（慢速视差） */}
-      <motion.div style={{ y: yLand }} className="absolute inset-x-0 bottom-0">
+      <m.div style={{ y: yLand }} className="absolute inset-x-0 bottom-0">
         <Landscape />
-      </motion.div>
+      </m.div>
 
       {/* 内容 */}
       {/* 内容（反向视差 + 渐隐） */}
-      <motion.div
+      <m.div
         style={{ y: yContent, opacity: fade }}
         className="relative z-10 mx-auto w-full max-w-3xl px-5 pt-28 pb-52 text-center sm:px-6 sm:pb-64"
       >
-        <motion.p
+        <m.p
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           className="kicker"
         >
           Samhain · October 31
-        </motion.p>
+        </m.p>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 26 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: 'easeOut' }}
           className="mt-6"
         >
           <ScatterTitle progress={scrollYProgress} />
-        </motion.div>
+        </m.div>
 
-        <motion.p
+        <m.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.35 }}
           className="text-gold-grad text-stroke-dark mt-3 font-cute text-xl tracking-[0.55em] indent-[0.55em] sm:text-3xl sm:tracking-[0.9em] sm:indent-[0.9em]"
         >
           万圣节之夜
-        </motion.p>
+        </m.p>
 
-        <motion.p
+        <m.p
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.5 }}
@@ -323,10 +327,10 @@ export function Hero() {
           两千年前的凯尔特人相信，十月的最后一夜是生者与亡者之间界门最薄的时刻。
           <br className="hidden sm:block" />
           今夜，我们依然点亮南瓜灯——为黑暗中的来客，也为屏幕前的你。
-        </motion.p>
+        </m.p>
 
         {/* 倒计时 */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.65 }}
@@ -350,10 +354,10 @@ export function Hero() {
               </div>
             ))}
           </div>
-        </motion.div>
+        </m.div>
 
         {/* 按钮 */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.85 }}
@@ -371,8 +375,8 @@ export function Hero() {
           >
             🎬 今夜放映
           </a>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
 
       {/* 滚动提示 */}
       <a

@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { SectionHead } from './SectionHead'
+import { useHoverCapable } from '../lib/env'
 
 const symbols = [
   {
@@ -45,6 +46,7 @@ const symbols = [
 ]
 
 export function Symbols() {
+  const hover = useHoverCapable()
   return (
     <section id="symbols" className="relative mx-auto max-w-6xl px-5 py-20 sm:px-6 sm:py-28">
       <SectionHead
@@ -56,13 +58,13 @@ export function Symbols() {
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {symbols.map((s, i) => (
-          <motion.article
+          <m.article
             key={s.title}
             initial={{ opacity: 0, scale: 0.78, y: 26 }}
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
             viewport={{ margin: '-50px' }}
             transition={{ type: 'spring', stiffness: 130, damping: 13, delay: (i % 4) * 0.1 }}
-            whileHover={{ y: -6, scale: 1.04 }}
+            whileHover={hover ? { y: -6, scale: 1.04 } : undefined}
             className="card group relative overflow-hidden p-6 text-center"
           >
             {/* 顶部微光 */}
@@ -73,7 +75,7 @@ export function Symbols() {
             <h3 className="mt-4 font-cute text-base font-semibold text-bone">{s.title}</h3>
             <div className="mx-auto mt-2.5 h-px w-8 bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
             <p className="mt-3 text-[13px] leading-6 text-ash">{s.body}</p>
-          </motion.article>
+          </m.article>
         ))}
       </div>
     </section>

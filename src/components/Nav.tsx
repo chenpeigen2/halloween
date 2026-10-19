@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion, useScroll } from 'framer-motion'
+import { AnimatePresence, m, useScroll } from 'framer-motion'
 
 const links = [
   { href: '#origin', label: '起源' },
@@ -26,7 +26,7 @@ export function Nav() {
   )
 
   return (
-    <motion.header
+    <m.header
       animate={{ y: hidden && !open ? -80 : 0 }}
       transition={{ duration: 0.32, ease: 'easeOut' }}
       className="fixed inset-x-0 top-0 z-40 border-b border-white/5 bg-ink/75 backdrop-blur-xl"
@@ -77,7 +77,7 @@ export function Nav() {
       {/* 手机端下拉面板 */}
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -107,9 +107,9 @@ export function Nav() {
                 </a>
               </li>
             </ul>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </m.header>
   )
 }

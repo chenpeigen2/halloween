@@ -1,0 +1,7 @@
+node_modules
+dist
+.git
+*.md
+mobile-check.mjs
+Dockerfile
+.dockerignore

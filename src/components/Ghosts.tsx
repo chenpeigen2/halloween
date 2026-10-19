@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 
 export function GhostShape({ className, fill = '#e8e2d5' }: { className?: string; fill?: string }) {
   return (
@@ -123,7 +123,7 @@ export function ClickTreats() {
     <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden" aria-hidden="true">
       <AnimatePresence>
         {bursts.map((b) => (
-          <motion.span
+          <m.span
             key={b.id}
             className="absolute select-none"
             style={{ left: b.x - 14, top: b.y - 14, fontSize: 28 }}
@@ -139,7 +139,7 @@ export function ClickTreats() {
             transition={{ duration: 1.9, ease: 'easeOut' }}
           >
             {b.glyph}
-          </motion.span>
+          </m.span>
         ))}
       </AnimatePresence>
     </div>
