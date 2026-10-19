@@ -32,7 +32,7 @@ export function Nav() {
       className="fixed inset-x-0 top-0 z-40 border-b border-white/5 bg-ink/75 backdrop-blur-xl"
     >
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-6">
-        <a href="#top" className="group flex items-center gap-2.5" onClick={() => setOpen(false)}>
+        <a href="#top" className="group flex items-center gap-2.5 py-1.5" onClick={() => setOpen(false)}>
           <span className="text-2xl glow">🎃</span>
           <span className="font-display text-base tracking-[0.22em] text-gold transition-colors group-hover:text-ember sm:text-xl">
             ALL HALLOWS

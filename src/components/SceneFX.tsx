@@ -1,5 +1,6 @@
 import type { RefObject } from 'react'
 import { m, useScroll, useSpring, useTransform } from 'framer-motion'
+import { useMediaQuery } from '../lib/env'
 
 /**
  * 滚动驱动的场景氛围：进入某板块时渐入聚光/暗角，离开时渐隐。
@@ -20,10 +21,14 @@ export function SceneVignette({
   const raw = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0])
   const opacity = useSpring(raw, { stiffness: 110, damping: 22 })
 
+  // 触屏端：暗角减淡，避免小屏内容被压灰
+  const touch = useMediaQuery('(hover: none)')
+  const soft = touch ? 0.55 : 1
+
   const overlay =
     variant === 'cinema'
-      ? 'radial-gradient(ellipse at 50% 40%, rgba(255,150,80,0.13) 0%, rgba(6,4,12,0.55) 48%, rgba(4,2,8,0.88) 100%)'
-      : 'radial-gradient(ellipse at 50% 45%, rgba(167,139,250,0.13) 0%, rgba(10,7,20,0.5) 52%, rgba(6,4,12,0.85) 100%)'
+      ? `radial-gradient(ellipse at 50% 40%, rgba(255,150,80,0.13) 0%, rgba(6,4,12,${0.55 * soft}) 48%, rgba(4,2,8,${0.88 * soft}) 100%)`
+      : `radial-gradient(ellipse at 50% 45%, rgba(167,139,250,0.13) 0%, rgba(10,7,20,${0.5 * soft}) 52%, rgba(6,4,12,${0.85 * soft}) 100%)`
 
   return (
     <m.div

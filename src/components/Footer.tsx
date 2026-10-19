@@ -40,7 +40,7 @@ export function Footer() {
               ['#cinema', '万圣节 Cinema'],
             ].map(([href, label]) => (
               <li key={href}>
-                <a className="inline-flex items-center gap-2 transition-colors hover:text-ember" href={href}>
+                <a className="inline-flex items-center gap-2 py-3 transition-colors hover:text-ember" href={href}>
                   <span className="text-ember/50">—</span>
                   {label}
                 </a>

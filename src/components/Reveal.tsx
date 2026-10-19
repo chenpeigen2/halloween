@@ -1,25 +1,18 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { m, useInView, type Transition } from 'framer-motion'
-import { scrollDirectionNow, useMediaQuery } from '../lib/env'
+import { useMediaQuery } from '../lib/env'
 
 /**
- * 入场动效播放策略：
- * - 向下滚（含快速甩动）→ 一律播放入场动画
- * - 向上滚（回顶）且从上缘进入 → 瞬间显示，保顺滑
- * - 离开视口 → 瞬间复位，下次向下滚照常播
+ * 入场动效：进入视口即播放（下滑/上滑都会播，保持“有动效”）。
+ * 离开视口瞬间复位（零时长），下次进入照常重播。
  */
 export function useRevealState(margin: `${number}px` = '-70px') {
   const ref = useRef<HTMLElement>(null)
   const inView = useInView(ref, { margin })
-  const el = ref.current
-  const enteredFromBottom = el
-    ? el.getBoundingClientRect().top > window.innerHeight * 0.5
-    : true
-  const scrollingDown = scrollDirectionNow() !== 'up'
   return {
     ref,
     inView,
-    playing: inView && (scrollingDown || enteredFromBottom),
+    playing: inView,
   }
 }
 
