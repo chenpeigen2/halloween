@@ -108,7 +108,7 @@ export function Timeline() {
               key={e.title}
               initial={{ opacity: 0, x: e.side === 'left' ? -40 : 40 }}
               whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
+              viewport={{ margin: '-60px' }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
               className={`relative sm:flex sm:items-center ${
                 e.side === 'right' ? 'sm:flex-row-reverse' : ''
@@ -142,7 +142,7 @@ export function Timeline() {
         <motion.div
           initial={{ opacity: 0, scaleX: 0.2 }}
           whileInView={{ opacity: 1, scaleX: 1 }}
-          viewport={{ once: true, margin: '-60px' }}
+          viewport={{ margin: '-60px' }}
           transition={{ duration: 0.7 }}
           className="rule-orn mt-14 text-gold"
         >

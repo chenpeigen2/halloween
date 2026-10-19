@@ -62,7 +62,7 @@ export function Customs() {
               key={c.title}
               initial={{ opacity: 0, y: 36, rotate: i % 2 ? 2.5 : -2.5 }}
               whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
+              viewport={{ margin: '-60px' }}
               transition={{ duration: 0.6, delay: (i % 3) * 0.12, ease: [0.2, 0.7, 0.2, 1] }}
               className="card group p-7"
             >

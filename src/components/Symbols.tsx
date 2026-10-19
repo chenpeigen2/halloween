@@ -60,7 +60,7 @@ export function Symbols() {
             key={s.title}
             initial={{ opacity: 0, scale: 0.78, y: 26 }}
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
+            viewport={{ margin: '-50px' }}
             transition={{ type: 'spring', stiffness: 130, damping: 13, delay: (i % 4) * 0.1 }}
             whileHover={{ y: -6, scale: 1.04 }}
             className="card group relative overflow-hidden p-6 text-center"

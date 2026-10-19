@@ -42,7 +42,7 @@ export function Reveal({
         scale: 1,
         filter: 'blur(0px)',
       }}
-      viewport={{ once: true, margin: '-70px' }}
+      viewport={{ margin: '-70px' }}
       transition={{ duration: 0.75, delay, ease: [0.2, 0.7, 0.2, 1] }}
     >
       {children}
@@ -63,7 +63,7 @@ export function CountUp({
   suffix?: string
 }) {
   const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-60px' })
+  const inView = useInView(ref, { margin: '-60px' })
   const [v, setV] = useState(0)
 
   useEffect(() => {

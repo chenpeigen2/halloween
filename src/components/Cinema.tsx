@@ -206,7 +206,7 @@ export function Cinema() {
         <motion.h2
           initial={{ opacity: 0, scale: 0.82, filter: 'blur(12px)' }}
           whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          viewport={{ once: true, margin: '-80px' }}
+          viewport={{ margin: '-80px' }}
           transition={{ duration: 0.8, type: 'spring', stiffness: 90, damping: 13 }}
           className="neon text-stroke-dark mt-6 font-display text-4xl leading-tight tracking-[0.04em] text-ember sm:text-6xl"
           style={{ textShadow: '0 0 18px rgba(255,122,26,0.65), 0 0 60px rgba(255,122,26,0.35)' }}
@@ -216,7 +216,7 @@ export function Cinema() {
         <motion.p
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-70px' }}
+          viewport={{ margin: '-70px' }}
           transition={{ duration: 0.7, delay: 0.25 }}
           className="mx-auto mt-5 max-w-xl text-sm leading-7 text-ash sm:text-[15px]"
         >
@@ -241,7 +241,7 @@ export function Cinema() {
               onClick={() => setActive(m)}
               initial={{ opacity: 0, y: 64, rotate: i % 2 ? 9 : -9, scale: 0.86 }}
               whileInView={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
-              viewport={{ once: true, margin: '-40px' }}
+              viewport={{ margin: '-40px' }}
               transition={{ type: 'spring', stiffness: 110, damping: 14, delay: (i % 4) * 0.12 }}
               whileHover={{ y: -10, rotate: i % 2 ? -1.6 : 1.6, scale: 1.03 }}
               whileTap={{ scale: 0.97 }}

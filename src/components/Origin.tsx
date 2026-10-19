@@ -54,7 +54,7 @@ export function Origin() {
             variants={fade}
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, margin: '-80px' }}
+            viewport={{ margin: '-80px' }}
             className="card card-frame p-8"
           >
             <div className="flex items-center gap-4">

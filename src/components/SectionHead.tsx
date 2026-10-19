@@ -17,7 +17,7 @@ export function SectionHead({
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-80px' }}
+        viewport={{ margin: '-80px' }}
         transition={{ duration: 0.6 }}
         className="kicker"
       >
@@ -32,7 +32,7 @@ export function SectionHead({
             className="inline-block"
             initial={{ opacity: 0, y: 28, rotate: i % 2 ? 7 : -7, scale: 0.8 }}
             whileInView={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
-            viewport={{ once: true, margin: '-80px' }}
+            viewport={{ margin: '-80px' }}
             transition={{
               delay: 0.12 + i * 0.07,
               type: 'spring',
@@ -49,7 +49,7 @@ export function SectionHead({
       <motion.div
         initial={{ opacity: 0, scaleX: 0.2 }}
         whileInView={{ opacity: 1, scaleX: 1 }}
-        viewport={{ once: true, margin: '-80px' }}
+        viewport={{ margin: '-80px' }}
         transition={{ duration: 0.7, delay: 0.35 }}
         className="rule-orn mt-5 text-gold"
       >
@@ -60,7 +60,7 @@ export function SectionHead({
         <motion.p
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
+          viewport={{ margin: '-80px' }}
           transition={{ duration: 0.7, delay: 0.45 }}
           className="mx-auto mt-5 max-w-2xl text-[15px] leading-8 text-ash"
         >
